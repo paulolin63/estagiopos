@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#161310" />
+    <title>TechRoute - Schedule a technical visit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesk:opsz,wght@12..96,400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="masthead">
+        <div class="masthead__brand">
+          <span class="masthead__mark" aria-hidden="true"></span>
+          <div>
+            <p class="masthead__kicker">Field dispatch</p>
+            <p class="masthead__name">TechRoute</p>
+          </div>
+        </div>
+        <p class="masthead__tag">Technical scheduling &amp; logistics</p>
+        <p id="store-status" class="masthead__status">SQLite · data/techroute.db</p>
+      </header>
+
+      <nav class="view-tabs" aria-label="App views">
+        <button type="button" class="view-tabs__btn is-on" data-view="schedule">
+          Work order
+        </button>
+        <button type="button" class="view-tabs__btn" data-view="week">
+          Calendar
+        </button>
+      </nav>
+
+      <section id="week-view" class="week" hidden>
+        <header class="week__head">
+          <p class="sheet__code">CAL-2WK</p>
+          <h1>Calendar</h1>
+          <p class="sheet__lede">
+            This week and next, by day. Color marks status. Filters still stack.
+          </p>
+          <p id="week-label" class="week__label"></p>
+          <ul id="cal-legend" class="cal-legend"></ul>
+        </header>
+
+        <div class="filters" id="week-filters">
+          <div class="filters__row">
+            <p class="filters__label">Technician</p>
+            <div id="filter-techs" class="filters__chips"></div>
+          </div>
+          <div class="filters__row">
+            <p class="filters__label">Status</p>
+            <div id="filter-statuses" class="filters__chips"></div>
+          </div>
+          <div class="filters__meta">
+            <p id="filter-summary" class="filters__summary"></p>
+            <button type="button" class="btn btn--ghost" id="filter-clear">
+              Clear filters
+            </button>
+          </div>
+        </div>
+
+        <div id="week-grid" class="cal"></div>
+      </section>
+
+      <main id="schedule-view" class="layout">
+        <section class="sheet" aria-labelledby="form-title">
+          <header class="sheet__head">
+            <p class="sheet__code">WO-NEW</p>
+            <h1 id="form-title">Schedule a technical visit</h1>
+            <p class="sheet__lede">
+              Capture the job window, site, technician, service type, and the
+              kit the crew should pack.
+            </p>
+          </header>
+
+          <form id="visit-form" class="form" novalidate>
+            <fieldset class="block">
+              <legend class="block__legend">
+                <span class="block__num">01</span>
+                Client &amp; site
+              </legend>
+
+              <div class="grid">
+                <div class="field field--span-2">
+                  <label for="clientName">Client name</label>
+                  <input
+                    id="clientName"
+                    name="clientName"
+                    type="text"
+                    autocomplete="organization"
+                    maxlength="120"
+                    required
+                    placeholder="Harbor Cold Storage"
+                  />
+                  <p class="field__error" data-error-for="clientName"></p>
+                </div>
+
+                <div class="field">
+                  <label for="clientPhone">Contact phone</label>
+                  <input
+                    id="clientPhone"
+                    name="clientPhone"
+                    type="tel"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    maxlength="24"
+                    required
+                    placeholder="+1 415 555 0142"
+                  />
+                  <p class="field__error" data-error-for="clientPhone"></p>
+                </div>
+
+                <div class="field field--span-2">
+                  <label for="location">Client location</label>
+                  <textarea
+                    id="location"
+                    name="location"
+                    rows="2"
+                    maxlength="240"
+                    required
+                    placeholder="Dock 4, 880 Cargo Way, Oakland, CA"
+                  ></textarea>
+                  <p class="field__error" data-error-for="location"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="block">
+              <legend class="block__legend">
+                <span class="block__num">02</span>
+                Window
+              </legend>
+
+              <div class="grid">
+                <div class="field">
+                  <label for="date">Visit date</label>
+                  <input id="date" name="date" type="date" required />
+                  <p class="field__error" data-error-for="date"></p>
+                </div>
+
+                <div class="field">
+                  <label for="time">Visit time</label>
+                  <input
+                    id="time"
+                    name="time"
+                    type="time"
+                    step="900"
+                    required
+                  />
+                  <p class="field__error" data-error-for="time"></p>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="block">
+              <legend class="block__legend">
+                <span class="block__num">03</span>
+                Assignment
+              </legend>
+
+              <div class="grid">
+                <div class="field">
+                  <label for="technician">Assigned technician</label>
+                  <select id="technician" name="technician" required>
+                    <option value="" disabled selected>
+                      Select technician
+                    </option>
+                  </select>
+                  <p class="field__error" data-error-for="technician"></p>
+                </div>
+
+                <div class="field">
+                  <label for="serviceType">Service type</label>
+                  <select id="serviceType" name="serviceType" required>
+                    <option value="" disabled selected>
+                      Select service type
+                    </option>
+                  </select>
+                  <p class="field__error" data-error-for="serviceType"></p>
+                </div>
+
+                <div class="field field--span-2">
+                  <label for="notes">Job notes <span class="opt">(optional)</span></label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    rows="3"
+                    maxlength="400"
+                    placeholder="Access code, parts to bring, site contact"
+                  ></textarea>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="block">
+              <legend class="block__legend">
+                <span class="block__num">04</span>
+                Resource allocation
+              </legend>
+              <div class="kit">
+                <div class="kit__bar">
+                  <p class="kit__hint">
+                    Tick materials, tools, and equipment for this visit.
+                    Selection is stored with the work order.
+                  </p>
+                  <p id="kit-count" class="kit__count">0 items selected</p>
+                </div>
+                <div id="resource-checklist" class="checklist"></div>
+              </div>
+            </fieldset>
+
+            <div class="form__actions">
+              <button type="submit" class="btn btn--primary">
+                File visit
+              </button>
+              <button type="reset" class="btn btn--ghost">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="board" aria-labelledby="board-title">
+          <header class="board__head">
+            <h2 id="board-title">Dispatch board</h2>
+            <p id="visit-count" class="board__count">0 visits</p>
+          </header>
+          <div class="board__tools">
+            <button type="button" id="export-json" class="btn btn--ghost">
+              Export JSON
+            </button>
+            <button type="button" id="export-db" class="btn btn--ghost">
+              Export SQLite
+            </button>
+            <button type="button" id="import-btn" class="btn btn--ghost">
+              Import
+            </button>
+            <input
+              id="import-file"
+              type="file"
+              accept=".json,application/json,.sqlite,.db,application/octet-stream"
+              hidden
+            />
+          </div>
+          <ol id="visit-list" class="tickets"></ol>
+        </aside>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <dialog id="status-dialog" class="dialog">
+      <form id="status-form" class="dialog__form" novalidate>
+        <p class="dialog__kicker">Status update</p>
+        <h2 id="status-dialog-title">Update visit</h2>
+        <p id="status-dialog-lede" class="dialog__lede"></p>
+        <input type="hidden" name="visitId" />
+
+        <div class="field">
+          <label for="statusValue">New status</label>
+          <select id="statusValue" name="status" required>
+            <option value="scheduled">Scheduled</option>
+            <option value="in_progress">In progress</option>
+            <option value="completed">Completed</option>
+            <option value="rescheduled">Rescheduled</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div id="reschedule-fields" class="grid" hidden>
+          <div class="field">
+            <label for="statusDate">New visit date</label>
+            <input id="statusDate" name="date" type="date" />
+            <p class="field__error" data-error-for="date"></p>
+          </div>
+          <div class="field">
+            <label for="statusTime">New visit time</label>
+            <input id="statusTime" name="time" type="time" step="900" />
+            <p class="field__error" data-error-for="time"></p>
+          </div>
+        </div>
+
+        <div id="reason-fields" hidden>
+          <p class="kit__hint">Pick a reason or type one. Required to reschedule or cancel.</p>
+          <div id="reason-presets" class="presets"></div>
+          <div class="field">
+            <label for="statusReason">Reason / comment</label>
+            <textarea
+              id="statusReason"
+              name="reason"
+              rows="3"
+              maxlength="400"
+              placeholder="Why is this visit moving or stopping?"
+            ></textarea>
+            <p class="field__error" data-error-for="reason"></p>
+          </div>
+        </div>
+
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">Save status</button>
+          <button type="button" id="status-cancel" class="btn btn--ghost">Back</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
