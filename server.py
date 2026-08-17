@@ -31,7 +31,8 @@ from db import (
     save_observations,
 )
 
-PORT = 8765
+PORT = int(os.environ.get("PORT", "8765"))
+HOST = os.environ.get("HOST", "0.0.0.0")
 VISIT_PATH = re.compile(r"^/api/visits/([0-9a-fA-F-]{8,36})$")
 STATUS_PATH = re.compile(r"^/api/visits/([0-9a-fA-F-]{8,36})/status$")
 OBS_PATH = re.compile(r"^/api/visits/([0-9a-fA-F-]{8,36})/observations$")
@@ -195,12 +196,13 @@ class Handler(SimpleHTTPRequestHandler):
 def main():
     init_db().close()
     info = db_status()
-    httpd = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+    ThreadingHTTPServer.allow_reuse_address = True
+    httpd = ThreadingHTTPServer((HOST, PORT), Handler)
     print("Database : %s" % DB_PATH)
     print("Tables   : %s" % ", ".join(info.get("tables") or [info["table"]]))
     print("Visits   : %s" % info["records"])
     print("Catalog  : %s resources" % info.get("resources", 0))
-    print("Open     : http://127.0.0.1:%s" % PORT)
+    print("Open     : http://%s:%s" % (HOST, PORT))
     httpd.serve_forever()
 
 

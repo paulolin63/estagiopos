@@ -11,6 +11,17 @@ python3 server.py
 
 Open http://127.0.0.1:8765
 
+## Public deploy (Render)
+
+This app is Python + SQLite, not a static Vercel/Netlify site.
+
+1. Push this repo to GitHub.
+2. [Render](https://render.com) -> New -> Web Service -> connect `paulolin63/estagiopos`.
+3. Runtime: Python. Build command: empty. Start command: `python3 server.py`
+4. Create Web Service. The URL looks like `https://estagiopos.onrender.com` ? paste that into the form.
+
+Free instances sleep after idle; first open can take ~30s. SQLite on Render is ephemeral (resets on redeploy).
+
 `init_db.py` creates `data/techroute.db` and the tables from `sql/schema.sql`. Visit rows stay empty. The resource catalog is seeded so the checklist works.
 
 ## What to evaluate
